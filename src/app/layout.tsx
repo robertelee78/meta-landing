@@ -32,13 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen`}
       >
-        <div className="aurora-bg fixed inset-0 pointer-events-none" />
-        <div className="grid-pattern fixed inset-0 pointer-events-none" />
-        <div className="relative z-10">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

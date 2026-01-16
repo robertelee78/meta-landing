@@ -1,34 +1,25 @@
 @import "tailwindcss";
 
+/* Matrix Terminal Theme */
 :root {
-  --background: #030712;
-  --foreground: #f8fafc;
-  --muted: #94a3b8;
-  --surface: #0f172a;
-  --surface-light: #1e293b;
-  --border: #1e293b;
-  --primary: #0ea5e9;
-  --primary-hover: #38bdf8;
-  --secondary: #8b5cf6;
-  --accent: #06b6d4;
-  --gradient-start: #0ea5e9;
-  --gradient-mid: #8b5cf6;
-  --gradient-end: #06b6d4;
+  --bg: #0a0a0a;
+  --terminal-green: #00ff41;
+  --terminal-dim: #00aa2a;
+  --terminal-bright: #33ff66;
+  --amber: #ffb000;
+  --amber-dim: #aa7700;
+  --cyan: #00ffff;
+  --magenta: #ff00ff;
+  --white: #cccccc;
+  --gray: #666666;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-surface: var(--surface);
-  --color-surface-light: var(--surface-light);
-  --color-border: var(--border);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@font-face {
+  font-family: 'VT323';
+  src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isfFJU.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 * {
@@ -40,151 +31,265 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--terminal-green);
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 18px;
+  line-height: 1.4;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  text-rendering: optimizeSpeed;
 }
 
-/* Scrollbar */
+/* CRT Scanlines */
+.scanlines::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* CRT Screen Glow */
+.crt-glow {
+  text-shadow:
+    0 0 5px var(--terminal-green),
+    0 0 10px var(--terminal-green),
+    0 0 20px var(--terminal-dim);
+}
+
+.crt-glow-amber {
+  text-shadow:
+    0 0 5px var(--amber),
+    0 0 10px var(--amber),
+    0 0 20px var(--amber-dim);
+}
+
+/* Flicker animation */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  97% { opacity: 0.9; }
+}
+
+.flicker {
+  animation: flicker 4s infinite;
+}
+
+/* Cursor blink */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor {
+  animation: blink 1s infinite;
+}
+
+/* Typing animation */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Screen on effect */
+@keyframes screen-on {
+  0% {
+    transform: scaleY(0.01);
+    filter: brightness(10);
+  }
+  50% {
+    transform: scaleY(0.01);
+    filter: brightness(5);
+  }
+  100% {
+    transform: scaleY(1);
+    filter: brightness(1);
+  }
+}
+
+.screen-on {
+  animation: screen-on 0.5s ease-out forwards;
+}
+
+/* Glitch effect */
+@keyframes glitch {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+}
+
+.glitch:hover {
+  animation: glitch 0.3s infinite;
+}
+
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: #111;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-light);
-  border-radius: 4px;
+  background: var(--terminal-dim);
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background: var(--terminal-green);
 }
 
 /* Selection */
 ::selection {
-  background-color: var(--primary);
-  color: var(--background);
+  background-color: var(--terminal-green);
+  color: var(--bg);
 }
 
-/* Gradient text utility */
-.gradient-text {
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* ASCII borders */
+.ascii-box {
+  border: 1px solid var(--terminal-dim);
+  position: relative;
 }
 
-/* Glow effects */
-.glow-blue {
-  box-shadow: 0 0 40px rgba(14, 165, 233, 0.3), 0 0 80px rgba(14, 165, 233, 0.1);
+.ascii-box::before {
+  content: '┌' attr(data-title) '┐';
+  position: absolute;
+  top: -1px;
+  left: 10px;
+  background: var(--bg);
+  padding: 0 4px;
+  color: var(--terminal-bright);
 }
 
-.glow-purple {
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.3), 0 0 80px rgba(139, 92, 246, 0.1);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 40px rgba(6, 182, 212, 0.3), 0 0 80px rgba(6, 182, 212, 0.1);
-}
-
-/* Aurora background animation */
-@keyframes aurora {
-  0%, 100% {
-    background-position: 0% 50%;
+/* Matrix rain effect */
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
   }
-  50% {
-    background-position: 100% 50%;
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
   }
 }
 
-.aurora-bg {
-  background: linear-gradient(
-    -45deg,
-    rgba(14, 165, 233, 0.15),
-    rgba(139, 92, 246, 0.15),
-    rgba(6, 182, 212, 0.15),
-    rgba(14, 165, 233, 0.15)
-  );
-  background-size: 400% 400%;
-  animation: aurora 15s ease infinite;
+.matrix-char {
+  position: fixed;
+  color: var(--terminal-green);
+  font-size: 20px;
+  opacity: 0.7;
+  animation: matrix-fall linear infinite;
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* Grid pattern overlay */
-.grid-pattern {
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
+/* Command prompt */
+.prompt::before {
+  content: '> ';
+  color: var(--terminal-bright);
 }
 
-/* Code block styling */
-code {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  background: var(--surface);
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-size: 0.9em;
+/* Link styling */
+a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--terminal-bright);
+  text-decoration: underline;
+}
+
+/* Input styling */
+input, textarea {
+  background: transparent;
+  border: none;
+  color: var(--terminal-green);
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  caret-color: var(--terminal-bright);
+}
+
+/* Horizontal rule */
+hr {
+  border: none;
+  border-top: 1px dashed var(--terminal-dim);
+  margin: 2rem 0;
+}
+
+/* Code blocks */
+code, pre {
+  font-family: inherit;
+  background: rgba(0, 255, 65, 0.05);
+  padding: 2px 6px;
 }
 
 pre {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  background: var(--surface);
-  padding: 1.5rem;
-  border-radius: 12px;
+  padding: 1rem;
   overflow-x: auto;
-  border: 1px solid var(--border);
+  border-left: 2px solid var(--terminal-dim);
 }
 
-/* Pulse animation for accents */
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+/* Loading dots */
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
 }
 
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+.loading::after {
+  content: '.';
+  animation: dots 1.5s infinite;
 }
 
-/* Floating animation */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+/* Boot sequence effect */
+@keyframes boot-line {
+  0% { opacity: 0; transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-.float {
-  animation: float 6s ease-in-out infinite;
+.boot-line {
+  animation: boot-line 0.1s ease-out forwards;
+  opacity: 0;
 }
 
-/* Gradient border */
-.gradient-border {
+/* Progress bar */
+.progress-bar {
+  background: var(--terminal-dim);
+  height: 4px;
   position: relative;
-  background: var(--surface);
-  border-radius: 16px;
+  overflow: hidden;
 }
 
-.gradient-border::before {
+.progress-bar::after {
   content: '';
   position: absolute;
-  inset: -1px;
-  border-radius: 17px;
-  padding: 1px;
-  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--terminal-green);
+  animation: progress 2s ease-out forwards;
+}
+
+@keyframes progress {
+  from { width: 0; }
+  to { width: 100%; }
 }

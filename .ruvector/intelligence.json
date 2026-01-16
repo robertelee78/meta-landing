@@ -1,0 +1,17 @@
+{
+  "patterns": {},
+  "memories": [],
+  "trajectories": [],
+  "errors": {},
+  "file_sequences": [],
+  "agents": {},
+  "edges": [],
+  "stats": {
+    "total_patterns": 0,
+    "total_memories": 0,
+    "total_trajectories": 0,
+    "total_errors": 0,
+    "session_count": 1,
+    "last_session": 1768585874
+  }
+}
