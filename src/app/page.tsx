@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 // Matrix rain character component
 function MatrixRain() {
   const [columns, setColumns] = useState<{ id: number; char: string; left: number; delay: number; duration: number }[]>([]);
 
   useEffect(() => {
-    const chars = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ012345789ABCDEFZ:・.\"=*+-<>¦｜╌";
+    const chars = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ012345789Z";
     const cols = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 30; i++) {
       cols.push({
         id: i,
         char: chars[Math.floor(Math.random() * chars.length)],
         left: Math.random() * 100,
-        delay: Math.random() * 10,
-        duration: 5 + Math.random() * 10,
+        delay: Math.random() * 8,
+        duration: 8 + Math.random() * 12,
       });
     }
     setColumns(cols);
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 opacity-30">
       {columns.map((col) => (
         <span
           key={col.id}
@@ -40,505 +40,471 @@ function MatrixRain() {
   );
 }
 
-// Typewriter with terminal effect
-function useTerminalTypewriter(lines: string[], baseDelay = 30) {
-  const [currentLineIndex, setCurrentLineIndex] = useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [displayedLines, setDisplayedLines] = useState<string[]>([]);
-  const [isComplete, setIsComplete] = useState(false);
-
-  useEffect(() => {
-    if (currentLineIndex >= lines.length) {
-      setIsComplete(true);
-      return;
-    }
-
-    const currentLine = lines[currentLineIndex];
-
-    if (currentCharIndex < currentLine.length) {
-      const delay = currentLine[currentCharIndex] === '\n' ? 100 : baseDelay;
-      const timeout = setTimeout(() => {
-        setCurrentCharIndex(prev => prev + 1);
-      }, delay);
-      return () => clearTimeout(timeout);
-    } else {
-      setDisplayedLines(prev => [...prev, currentLine]);
-      setCurrentLineIndex(prev => prev + 1);
-      setCurrentCharIndex(0);
-    }
-  }, [currentLineIndex, currentCharIndex, lines, baseDelay]);
-
-  const currentTyping = currentLineIndex < lines.length
-    ? lines[currentLineIndex].slice(0, currentCharIndex)
-    : "";
-
-  return { displayedLines, currentTyping, isComplete };
+// Terminal output line
+interface OutputLine {
+  text: string;
+  type: "input" | "output" | "system" | "header" | "error" | "success" | "amber";
 }
 
-// Boot sequence component
-function BootSequence({ onComplete }: { onComplete: () => void }) {
-  const bootLines = [
-    "BIOS v2.4.1 (c) AGI Dreams Systems",
-    "Memory Test: 640K OK",
-    "Loading CLAUDE.SYS...",
-    "Neural Interface: ACTIVE",
-    "RuVector Engine: ONLINE",
-    "Swarm Protocol: INITIALIZED",
-    "",
-    "████████████████████████ 100%",
-    "",
-    "Type 'help' for commands or scroll to explore",
-  ];
+// Content data
+const CONTENT = {
+  banner: `
+ ███████╗████████╗ █████╗ ██████╗ ████████╗    ██╗    ██╗██╗████████╗██╗  ██╗    ██╗    ██╗██╗  ██╗██╗   ██╗
+ ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝    ██║    ██║██║╚══██╔══╝██║  ██║    ██║    ██║██║  ██║╚██╗ ██╔╝
+ ███████╗   ██║   ███████║██████╔╝   ██║       ██║ █╗ ██║██║   ██║   ███████║    ██║ █╗ ██║███████║ ╚████╔╝
+ ╚════██║   ██║   ██╔══██║██╔══██╗   ██║       ██║███╗██║██║   ██║   ██╔══██║    ██║███╗██║██╔══██║  ╚██╔╝
+ ███████║   ██║   ██║  ██║██║  ██║   ██║       ╚███╔███╔╝██║   ██║   ██║  ██║    ╚███╔███╔╝██║  ██║   ██║
+ ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝        ╚══╝╚══╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝`,
 
-  const { displayedLines, currentTyping, isComplete } = useTerminalTypewriter(bootLines, 15);
+  help: `
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                              AVAILABLE COMMANDS                               ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║  help          - Display this help menu                                       ║
+║  menu          - Show main navigation menu                                    ║
+║  1 | why       - THE PHILOSOPHY: Start with Why                               ║
+║  2 | stack     - THE STACK: Tools that play together                          ║
+║  3 | workflow  - THE WORKFLOW: Five steps, no magic                           ║
+║  4 | proof     - THE PROOF: This page IS the proof                            ║
+║  5 | contact   - SYSOP contact information                                    ║
+║  about         - About this system                                            ║
+║  clear         - Clear the terminal                                           ║
+║  rabbit        - Follow the white rabbit...                                   ║
+╚═══════════════════════════════════════════════════════════════════════════════╝`,
 
-  useEffect(() => {
-    if (isComplete) {
-      const timeout = setTimeout(onComplete, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [isComplete, onComplete]);
+  menu: `
+┌─────────────────────────────────────────────────────────────────┐
+│                         MAIN MENU                               │
+├─────────────────────────────────────────────────────────────────┤
+│  [1] THE PHILOSOPHY    - Start with Why                         │
+│  [2] THE STACK         - Tools that play together               │
+│  [3] THE WORKFLOW      - Five steps, no magic                   │
+│  [4] THE PROOF         - This page IS the proof                 │
+│  [5] CONTACT SYSOP     - Get in touch                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Type a number or command. Type 'help' for all commands.        │
+└─────────────────────────────────────────────────────────────────┘`,
 
-  return (
-    <div className="font-mono text-sm">
-      {displayedLines.map((line, i) => (
-        <div key={i} className="boot-line" style={{ animationDelay: `${i * 0.05}s` }}>
-          {line.includes("████") ? (
-            <span className="text-[var(--terminal-bright)]">{line}</span>
-          ) : line.startsWith("Type") ? (
-            <span className="text-[var(--amber)]">{line}</span>
-          ) : (
-            line
-          )}
-        </div>
-      ))}
-      {!isComplete && (
-        <div>
-          {currentTyping}
-          <span className="cursor">█</span>
-        </div>
-      )}
-    </div>
-  );
-}
+  philosophy: `
+══════════════════════════════════════════════════════════════════════════════════
+                              [01] THE PHILOSOPHY
+══════════════════════════════════════════════════════════════════════════════════
 
-// ASCII Art Header
-function ASCIIHeader() {
-  return (
-    <pre className="text-[var(--terminal-bright)] text-xs sm:text-sm leading-tight crt-glow">
-{`
- ███████╗████████╗ █████╗ ██████╗ ████████╗
- ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝
- ███████╗   ██║   ███████║██████╔╝   ██║
- ╚════██║   ██║   ██╔══██║██╔══██╗   ██║
- ███████║   ██║   ██║  ██║██║  ██║   ██║
- ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝
- ██╗    ██╗██╗████████╗██╗  ██╗
- ██║    ██║██║╚══██╔══╝██║  ██║
- ██║ █╗ ██║██║   ██║   ███████║
- ██║███╗██║██║   ██║   ██╔══██║
- ╚███╔███╔╝██║   ██║   ██║  ██║
-  ╚══╝╚══╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝
- ██╗    ██╗██╗  ██╗██╗   ██╗
- ██║    ██║██║  ██║╚██╗ ██╔╝
- ██║ █╗ ██║███████║ ╚████╔╝
- ██║███╗██║██╔══██║  ╚██╔╝     ▄▄
- ╚███╔███╔╝██║  ██║   ██║      ██
-  ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝      ▀▀
-`}
-    </pre>
-  );
-}
+  "What job is this page HIRING to do for the visitor?"
 
-// BBS-style menu
-function BBSMenu({ activeSection }: { activeSection: string }) {
-  const menuItems = [
-    { key: "1", label: "THE PHILOSOPHY", id: "philosophy" },
-    { key: "2", label: "THE STACK", id: "stack" },
-    { key: "3", label: "THE WORKFLOW", id: "workflow" },
-    { key: "4", label: "THE PROOF", id: "meta" },
-    { key: "Q", label: "CONTACT SYSOP", id: "contact" },
-  ];
+  Before I write a single line of code, I ask this question.
+  The clarity on WHY determines the quality of WHAT.
 
-  return (
-    <div className="ascii-box p-4 my-8" data-title="[ MAIN MENU ]">
-      <div className="text-[var(--amber)] mb-4 crt-glow-amber">
-        ═══════════════════════════════════════════
-      </div>
-      {menuItems.map((item) => (
-        <a
-          key={item.key}
-          href={`#${item.id}`}
-          className={`block py-1 hover:bg-[var(--terminal-green)] hover:text-black transition-colors ${
-            activeSection === item.id ? "text-[var(--terminal-bright)]" : ""
-          }`}
-        >
-          <span className="text-[var(--amber)]">[{item.key}]</span> {item.label}
-          {activeSection === item.id && <span className="ml-2">◄──</span>}
-        </a>
-      ))}
-      <div className="text-[var(--amber)] mt-4 crt-glow-amber">
-        ═══════════════════════════════════════════
-      </div>
-      <div className="text-[var(--gray)] text-xs mt-2">
-        Press number or scroll to navigate
-      </div>
-    </div>
-  );
-}
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ CORE_PRINCIPLES.DAT                                                         │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ 01. CLEAR GOALS FIRST     ─  Define the visitor's takeaway before design    │
+  │ 02. WHY → WHAT → HOW      ─  Every task needs problem, solution, details    │
+  │ 03. CHESTERTON'S FENCE    ─  Understand before modifying. Measure 3x.       │
+  │ 04. NO SHORTCUTS          ─  No fallback code. No TODO later. Excellence.   │
+  └─────────────────────────────────────────────────────────────────────────────┘
 
-// Terminal prompt line
-function PromptLine({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-2 my-2">
-      <span className="text-[var(--terminal-bright)] shrink-0">&gt;</span>
-      <span>{children}</span>
-    </div>
-  );
-}
+  Type 'menu' for navigation or '2' for THE STACK
+══════════════════════════════════════════════════════════════════════════════════`,
 
-// Philosophy Section (BBS style)
-function PhilosophySection() {
-  return (
-    <section id="philosophy" className="my-16 scroll-mt-8">
-      <div className="text-[var(--cyan)] mb-4">
-        ╔══════════════════════════════════════════════════════════════╗
-        <br />
-        ║ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [01] THE PHILOSOPHY &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ║
-        <br />
-        ╚══════════════════════════════════════════════════════════════╝
-      </div>
+  stack: `
+══════════════════════════════════════════════════════════════════════════════════
+                                [02] THE STACK
+══════════════════════════════════════════════════════════════════════════════════
 
-      <div className="ml-4 space-y-4">
-        <PromptLine>cat /etc/philosophy.txt</PromptLine>
+  > systemctl status --all
 
-        <blockquote className="text-xl crt-glow pl-4 border-l-2 border-[var(--terminal-dim)] my-6">
-          "What job is this page <span className="text-[var(--amber)]">HIRING</span> to do for the visitor?"
-        </blockquote>
+  SERVICE          VERSION      STATUS     DESCRIPTION
+  ─────────────────────────────────────────────────────────────────
+  CLAUDE_CODE      opus-4.5     [●]        AI Partner
+  CLAUDE_FLOW      v3-alpha     [●]        Swarm Orchestration
+  RUVECTOR         v1.2         [●]        Pattern Learning
+  ARCHON           v2.1         [●]        Task Management
+  VI               9.0          [○]        The OG Editor
 
-        <p className="text-[var(--terminal-dim)]">
-          Before I write a single line of code, I ask this question.
-          The clarity on <span className="text-[var(--terminal-bright)]">WHY</span> determines
-          the quality of <span className="text-[var(--terminal-bright)]">WHAT</span>.
-        </p>
+  > cat aliases.sh
+  ────────────────────────────────────────────────────────────────
+  alias cfinit='npx claude-flow@alpha init --force'
+  alias dsp='claude --dangerously-skip-permissions'
 
-        <div className="mt-8 space-y-2">
-          <div className="text-[var(--amber)]">CORE_PRINCIPLES.DAT:</div>
-          {[
-            { num: "01", title: "CLEAR GOALS FIRST", desc: "Define the visitor's takeaway before design" },
-            { num: "02", title: "WHY → WHAT → HOW", desc: "Every task needs problem, solution, and details" },
-            { num: "03", title: "CHESTERTON'S FENCE", desc: "Understand before modifying. Measure 3x, cut once." },
-            { num: "04", title: "NO SHORTCUTS", desc: "No fallback code. No TODO later. Pure excellence." },
-          ].map((item) => (
-            <div key={item.num} className="flex">
-              <span className="text-[var(--cyan)] w-8">{item.num}.</span>
-              <span className="text-[var(--terminal-bright)]">{item.title}</span>
-              <span className="text-[var(--gray)] mx-2">─</span>
-              <span className="text-[var(--terminal-dim)]">{item.desc}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  These aren't just tools. They're a SYSTEM.
+  Each piece has a job. Together, they ship.
 
-// Stack Section
-function StackSection() {
-  const tools = [
-    { name: "CLAUDE_CODE", version: "opus-4", status: "ACTIVE", desc: "AI Partner" },
-    { name: "CLAUDE_FLOW", version: "v3-alpha", status: "ACTIVE", desc: "Swarm Orchestration" },
-    { name: "RUVECTOR", version: "v1.2", status: "ACTIVE", desc: "Pattern Learning" },
-    { name: "ARCHON", version: "v2.1", status: "ACTIVE", desc: "Task Management" },
-    { name: "VI", version: "9.0", status: "CLASSIC", desc: "The OG Editor" },
-  ];
+  Type 'menu' for navigation or '3' for THE WORKFLOW
+══════════════════════════════════════════════════════════════════════════════════`,
 
-  return (
-    <section id="stack" className="my-16 scroll-mt-8">
-      <div className="text-[var(--magenta)] mb-4">
-        ╔══════════════════════════════════════════════════════════════╗
-        <br />
-        ║ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [02] THE STACK &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;║
-        <br />
-        ╚══════════════════════════════════════════════════════════════╝
-      </div>
+  workflow: `
+══════════════════════════════════════════════════════════════════════════════════
+                               [03] THE WORKFLOW
+══════════════════════════════════════════════════════════════════════════════════
 
-      <div className="ml-4">
-        <PromptLine>systemctl status --all</PromptLine>
+  > ./workflow --verbose
 
-        <div className="mt-4 font-mono text-sm">
-          <div className="text-[var(--gray)] mb-2">
-            SERVICE &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; VERSION &nbsp; &nbsp; STATUS &nbsp; &nbsp; DESCRIPTION
-          </div>
-          <div className="text-[var(--gray)]">
-            ─────────────────────────────────────────────────────────
-          </div>
-          {tools.map((tool) => (
-            <div key={tool.name} className="flex items-center py-1">
-              <span className="text-[var(--terminal-bright)] w-20">{tool.name}</span>
-              <span className="text-[var(--cyan)] w-16">{tool.version}</span>
-              <span className={`w-12 ${tool.status === "ACTIVE" ? "text-[var(--terminal-green)]" : "text-[var(--amber)]"}`}>
-                [{tool.status === "ACTIVE" ? "●" : "○"}]
-              </span>
-              <span className="text-[var(--terminal-dim)]">{tool.desc}</span>
-            </div>
-          ))}
-        </div>
+  [1] INITIALIZE & PLAN
+      └─ mkdir → cfinit → add MCPs → initial prompt with context
 
-        <div className="mt-8">
-          <PromptLine>cat workflow.sh</PromptLine>
-          <pre className="bg-black/50 p-4 mt-2 text-sm border border-[var(--terminal-dim)]">
-{`#!/bin/bash
-# The workflow that built THIS PAGE
+  [2] PRD → TASKS
+      └─ Split requirements into Archon tasks. Why/What/How format.
 
-$ mkdir meta-landing && cd meta-landing
-$ cfinit  # npx claude-flow@alpha init --force
-✓ Claude Flow initialized
+  [3] EXECUTE
+      └─ Fetch highest priority. Analyze BEFORE coding. Plan first.
 
-$ dsp "I'm competing in a hackathon..."
+  [4] VALIDATE
+      └─ Test it. Get human feedback. (I ask my wife and kids.)
 
-[CLAUDE] Spawning research swarm...
-> agent-01: Design Trends 2026    [COMPLETE]
-> agent-02: Tech Stack Analysis   [COMPLETE]
-> agent-03: Workflow Examples     [COMPLETE]
+  [5] COMMIT
+      └─ Proper commits after EVERY task. Sequential undo = safety.
 
-[CLAUDE] Initiating PM interview mode...
-> Q1: Walk me through your workflow...
-> Q2: What tools do you actually use...
-> Q3: Secret weapon?
->     "ALWAYS START WITH WHY"`}
-          </pre>
-        </div>
-      </div>
-    </section>
-  );
-}
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ ⚠  CRITICAL INSIGHT:                                                        │
+  │    The secret weapon isn't the AI. It's the DISCIPLINE.                     │
+  │    Clear goals. Task-driven. Commit after wins. Get human feedback.         │
+  └─────────────────────────────────────────────────────────────────────────────┘
 
-// Workflow Section
-function WorkflowSection() {
-  const steps = [
-    { cmd: "init", title: "INITIALIZE & PLAN", desc: "mkdir → cfinit → add MCPs → initial prompt with context" },
-    { cmd: "split", title: "PRD → TASKS", desc: "Split requirements into Archon tasks. Why/What/How format." },
-    { cmd: "exec", title: "EXECUTE", desc: "Fetch highest priority. Analyze BEFORE coding. Plan first." },
-    { cmd: "test", title: "VALIDATE", desc: "Test it. Get human feedback. (I ask my wife and kids.)" },
-    { cmd: "save", title: "COMMIT", desc: "Proper commits after EVERY task. Sequential undo = safety." },
-  ];
+  Type 'menu' for navigation or '4' for THE PROOF
+══════════════════════════════════════════════════════════════════════════════════`,
 
-  return (
-    <section id="workflow" className="my-16 scroll-mt-8">
-      <div className="text-[var(--terminal-green)] mb-4">
-        ╔══════════════════════════════════════════════════════════════╗
-        <br />
-        ║ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[03] THE WORKFLOW &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;║
-        <br />
-        ╚══════════════════════════════════════════════════════════════╝
-      </div>
+  proof: `
+══════════════════════════════════════════════════════════════════════════════════
+                                [04] THE PROOF
+══════════════════════════════════════════════════════════════════════════════════
 
-      <div className="ml-4">
-        <PromptLine>./workflow --verbose</PromptLine>
+  > neofetch --meta
 
-        <div className="mt-4 space-y-4">
-          {steps.map((step, i) => (
-            <div key={step.cmd} className="flex items-start">
-              <span className="text-[var(--amber)] w-8">[{i + 1}]</span>
-              <div>
-                <span className="text-[var(--terminal-bright)]">{step.title}</span>
-                <div className="text-[var(--terminal-dim)] ml-4">└─ {step.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+        .--.          page@meta-landing
+       |o_o |         ─────────────────────
+       |:_/ |         Build Time: ~90 minutes
+      //   \\ \\        Agents Spawned: 3
+     (|     | )       Interview Qs: 6
+    /'\\_   _/\`\\       First Paint: 68ms
+    \\___)=(___/       Framework: Next.js 16
+                      Style: Tailwind + Matrix CSS
+                      AI: Claude Opus 4.5
 
-        <div className="mt-8 p-4 border border-dashed border-[var(--terminal-dim)]">
-          <div className="text-[var(--amber)]">⚠ CRITICAL INSIGHT:</div>
-          <p className="mt-2">
-            The secret weapon isn&apos;t the AI. It&apos;s the <span className="text-[var(--terminal-bright)]">DISCIPLINE</span>.
-            <br />
-            Clear goals. Task-driven. Commit after wins. Get human feedback.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │ THE_META_TRUTH.txt                                                          │
+  ├─────────────────────────────────────────────────────────────────────────────┤
+  │ This isn't a mockup. This isn't a concept.                                  │
+  │ You are looking at the ACTUAL OUTPUT of the workflow being described.       │
+  │ The page IS the proof.                                                      │
+  │                                                                             │
+  │ "Follow the white rabbit..."                                                │
+  └─────────────────────────────────────────────────────────────────────────────┘
 
-// Meta Section (The Proof)
-function MetaSection() {
-  const [stats] = useState({
-    buildTime: "~90",
-    agents: 3,
-    questions: 6,
-    fcp: 236,
-  });
+  Type 'menu' for navigation or '5' for CONTACT
+══════════════════════════════════════════════════════════════════════════════════`,
 
-  return (
-    <section id="meta" className="my-16 scroll-mt-8">
-      <div className="text-[var(--amber)] mb-4 crt-glow-amber">
-        ╔══════════════════════════════════════════════════════════════╗
-        <br />
-        ║ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[04] THE PROOF &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;║
-        <br />
-        ╚══════════════════════════════════════════════════════════════╝
-      </div>
+  contact: `
+══════════════════════════════════════════════════════════════════════════════════
+                               [05] CONTACT SYSOP
+══════════════════════════════════════════════════════════════════════════════════
 
-      <div className="ml-4">
-        <PromptLine>neofetch --meta</PromptLine>
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                                                                             │
+  │   SYSOP: Robert E. Lee                                                      │
+  │   EMAIL: robert@agidreams.us                                                │
+  │                                                                             │
+  │   Built with CLAUDE_CODE + CLAUDE_FLOW                                      │
+  │   January 2026                                                              │
+  │                                                                             │
+  │   "Always start with WHY"                                                   │
+  │                                                                             │
+  └─────────────────────────────────────────────────────────────────────────────┘
 
-        <div className="mt-4 flex flex-col md:flex-row gap-8">
-          <pre className="text-[var(--terminal-bright)] text-xs">
-{`        .--.
-       |o_o |
-       |:_/ |
-      //   \\ \\
-     (|     | )
-    /'\\_   _/\`\\
-    \\___)=(___/`}
-          </pre>
+  Type 'menu' for navigation or 'help' for commands
+══════════════════════════════════════════════════════════════════════════════════`,
 
-          <div className="space-y-1 text-sm">
-            <div><span className="text-[var(--cyan)]">page@</span><span className="text-[var(--terminal-bright)]">meta-landing</span></div>
-            <div className="text-[var(--gray)]">─────────────────────</div>
-            <div><span className="text-[var(--terminal-bright)]">Build Time:</span> {stats.buildTime} minutes</div>
-            <div><span className="text-[var(--terminal-bright)]">Agents Spawned:</span> {stats.agents}</div>
-            <div><span className="text-[var(--terminal-bright)]">Interview Qs:</span> {stats.questions}</div>
-            <div><span className="text-[var(--terminal-bright)]">First Paint:</span> {stats.fcp}ms</div>
-            <div><span className="text-[var(--terminal-bright)]">Framework:</span> Next.js 16</div>
-            <div><span className="text-[var(--terminal-bright)]">Style:</span> Tailwind + Matrix CSS</div>
-            <div><span className="text-[var(--terminal-bright)]">AI:</span> Claude Opus 4.5</div>
-          </div>
-        </div>
+  about: `
+══════════════════════════════════════════════════════════════════════════════════
+                                ABOUT THIS SYSTEM
+══════════════════════════════════════════════════════════════════════════════════
 
-        <div className="mt-8">
-          <PromptLine>cat THE_META_TRUTH.txt</PromptLine>
-          <div className="mt-4 p-4 bg-black/50 border border-[var(--terminal-green)]">
-            <p className="text-[var(--terminal-bright)]">
-              This isn&apos;t a mockup. This isn&apos;t a concept.
-            </p>
-            <p className="mt-2">
-              You are looking at the <span className="text-[var(--amber)]">ACTUAL OUTPUT</span> of the workflow
-              being described. The page IS the proof.
-            </p>
-            <p className="mt-4 text-[var(--cyan)]">
-              &quot;Follow the white rabbit...&quot;
-            </p>
-          </div>
-        </div>
+  META-LANDING v1.0 - An Interactive Terminal Experience
 
-        <div className="mt-8">
-          <div className="text-[var(--gray)] mb-2">INITIAL_PROMPT.LOG:</div>
-          <pre className="bg-black/30 p-4 text-xs border-l-2 border-[var(--terminal-dim)] overflow-x-auto">
-{`"I'm competing in a mini hackathon challenge today.
-'Meta Landing Page' - Build a beautiful landing page
-that showcases how YOU build beautiful frontends with
-your AI coding agent.
+  This is not a typical landing page. This IS a terminal.
+  You're connected to a simulated Unix system that demonstrates
+  how I build production frontends with AI.
 
-The twist? You're using that very workflow to build it.
+  The twist? This very page was built using the workflow it describes.
 
-Go into expert PM/TPM mode and do a deep Q&A interview
-with me. Separately, fire off research agents to
-investigate the best tech, scheme, look, feel..."`}
-          </pre>
-        </div>
-      </div>
-    </section>
-  );
-}
+  ┌─ INITIAL PROMPT ───────────────────────────────────────────────────────────┐
+  │ "I'm competing in a mini hackathon challenge today.                        │
+  │  'Meta Landing Page' - Build a landing page that showcases how YOU build   │
+  │  beautiful frontends with your AI coding agent.                            │
+  │                                                                            │
+  │  The twist? You're using that very workflow to build it..."                │
+  └────────────────────────────────────────────────────────────────────────────┘
 
-// Contact/Footer
-function ContactSection() {
-  return (
-    <section id="contact" className="my-16 scroll-mt-8">
-      <div className="text-[var(--gray)]">
-        ════════════════════════════════════════════════════════════════
-      </div>
-      <div className="py-8 text-center">
-        <div className="text-[var(--terminal-dim)]">SYSOP:</div>
-        <div className="text-[var(--terminal-bright)] text-xl">Robert E. Lee</div>
-        <a
-          href="mailto:robert@agidreams.us"
-          className="text-[var(--cyan)] hover:text-[var(--terminal-bright)]"
-        >
-          robert@agidreams.us
-        </a>
-        <div className="mt-4 text-[var(--gray)] text-sm">
-          Built with CLAUDE_CODE + CLAUDE_FLOW | January 2026
-        </div>
-        <div className="mt-2 text-[var(--terminal-dim)] text-xs">
-          &quot;Always start with WHY&quot;
-        </div>
-      </div>
-      <div className="text-[var(--gray)]">
-        ════════════════════════════════════════════════════════════════
-      </div>
-      <div className="text-center mt-4 text-[var(--terminal-dim)] text-sm">
-        Connection closed. Thank you for visiting. <span className="cursor">█</span>
-      </div>
-    </section>
-  );
-}
+  Type 'menu' to continue exploring.
+══════════════════════════════════════════════════════════════════════════════════`,
+
+  rabbit: `
+
+                    (\\_/)
+                    ( •_•)
+                    / >🔴  Follow the white rabbit, Neo.
+
+  Wake up...
+  The Matrix has you...
+
+  The secret isn't the AI.
+  The secret is knowing WHY before WHAT.
+  The secret is discipline over chaos.
+  The secret is committing after every win.
+  The secret is getting human feedback.
+
+  There is no spoon. There is no secret.
+  Just clear thinking and consistent execution.
+
+  Type 'menu' to return.
+`,
+};
 
 export default function Home() {
+  const [output, setOutput] = useState<OutputLine[]>([]);
+  const [input, setInput] = useState("");
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [booted, setBooted] = useState(false);
-  const [activeSection, setActiveSection] = useState("philosophy");
-  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
-  // Track active section on scroll
+  const addOutput = useCallback((lines: OutputLine[]) => {
+    setOutput(prev => [...prev, ...lines]);
+  }, []);
+
+  const clearTerminal = useCallback(() => {
+    setOutput([]);
+  }, []);
+
+  // Boot sequence
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["philosophy", "stack", "workflow", "meta", "contact"];
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 200 && rect.bottom >= 200) {
-            setActiveSection(section);
-            break;
-          }
-        }
+    if (booted) return;
+
+    const bootSequence = async () => {
+      const bootLines: { text: string; delay: number; type: OutputLine["type"] }[] = [
+        { text: "BIOS v2.4.1 (c) AGI Dreams Systems", delay: 100, type: "system" },
+        { text: "Memory Test: 640K OK", delay: 150, type: "system" },
+        { text: "Loading CLAUDE.SYS...", delay: 200, type: "system" },
+        { text: "Neural Interface: ACTIVE", delay: 150, type: "success" },
+        { text: "RuVector Engine: ONLINE", delay: 150, type: "success" },
+        { text: "Swarm Protocol: INITIALIZED", delay: 150, type: "success" },
+        { text: "", delay: 100, type: "output" },
+        { text: "████████████████████████████████████████ 100%", delay: 300, type: "success" },
+        { text: "", delay: 200, type: "output" },
+        { text: "Connection established. Welcome to META-LANDING.", delay: 100, type: "amber" },
+        { text: "", delay: 50, type: "output" },
+      ];
+
+      for (const line of bootLines) {
+        await new Promise(resolve => setTimeout(resolve, line.delay));
+        addOutput([{ text: line.text, type: line.type }]);
       }
+
+      // Add banner
+      addOutput([{ text: CONTENT.banner, type: "header" }]);
+      await new Promise(resolve => setTimeout(resolve, 200));
+      addOutput([
+        { text: "", type: "output" },
+        { text: "  How I build production frontends with AI in hours, not days.", type: "amber" },
+        { text: "  Type 'help' for commands or 'menu' to begin.", type: "system" },
+        { text: "", type: "output" },
+      ]);
+
+      setBooted(true);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    bootSequence();
+  }, [booted, addOutput]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [output]);
+
+  // Focus input on click
+  const focusInput = () => {
+    inputRef.current?.focus();
+  };
+
+  // Process command
+  const processCommand = (cmd: string) => {
+    const trimmed = cmd.trim().toLowerCase();
+
+    // Add command to output
+    addOutput([{ text: `> ${cmd}`, type: "input" }]);
+
+    // Add to history
+    if (trimmed) {
+      setCommandHistory(prev => [...prev, trimmed]);
+      setHistoryIndex(-1);
+    }
+
+    // Process
+    switch (trimmed) {
+      case "help":
+      case "?":
+        addOutput([{ text: CONTENT.help, type: "output" }]);
+        break;
+      case "menu":
+      case "m":
+        addOutput([{ text: CONTENT.menu, type: "output" }]);
+        break;
+      case "1":
+      case "why":
+      case "philosophy":
+        addOutput([{ text: CONTENT.philosophy, type: "output" }]);
+        break;
+      case "2":
+      case "stack":
+      case "tools":
+        addOutput([{ text: CONTENT.stack, type: "output" }]);
+        break;
+      case "3":
+      case "workflow":
+      case "flow":
+        addOutput([{ text: CONTENT.workflow, type: "output" }]);
+        break;
+      case "4":
+      case "proof":
+      case "meta":
+        addOutput([{ text: CONTENT.proof, type: "output" }]);
+        break;
+      case "5":
+      case "contact":
+      case "sysop":
+        addOutput([{ text: CONTENT.contact, type: "output" }]);
+        break;
+      case "about":
+        addOutput([{ text: CONTENT.about, type: "output" }]);
+        break;
+      case "clear":
+      case "cls":
+        clearTerminal();
+        break;
+      case "rabbit":
+      case "follow":
+      case "white rabbit":
+        addOutput([{ text: CONTENT.rabbit, type: "output" }]);
+        break;
+      case "banner":
+        addOutput([{ text: CONTENT.banner, type: "header" }]);
+        break;
+      case "ls":
+        addOutput([{ text: "PHILOSOPHY.txt  STACK.txt  WORKFLOW.txt  PROOF.txt  CONTACT.txt  .rabbit", type: "output" }]);
+        break;
+      case "whoami":
+        addOutput([{ text: "visitor@meta-landing", type: "output" }]);
+        break;
+      case "pwd":
+        addOutput([{ text: "/home/visitor/start-with-why", type: "output" }]);
+        break;
+      case "date":
+        addOutput([{ text: new Date().toString(), type: "output" }]);
+        break;
+      case "uname":
+      case "uname -a":
+        addOutput([{ text: "META-LANDING 1.0 Claude-Opus-4.5 x86_64 GNU/Linux", type: "output" }]);
+        break;
+      case "exit":
+      case "quit":
+      case "logout":
+        addOutput([
+          { text: "", type: "output" },
+          { text: "Thanks for visiting! Connection closed.", type: "amber" },
+          { text: "Remember: Always start with WHY.", type: "system" },
+          { text: "", type: "output" },
+        ]);
+        break;
+      case "":
+        // Empty command, just show new prompt
+        break;
+      default:
+        addOutput([{ text: `Command not found: ${cmd}. Type 'help' for available commands.`, type: "error" }]);
+    }
+  };
+
+  // Handle key events
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      processCommand(input);
+      setInput("");
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (commandHistory.length > 0) {
+        const newIndex = historyIndex < commandHistory.length - 1 ? historyIndex + 1 : historyIndex;
+        setHistoryIndex(newIndex);
+        setInput(commandHistory[commandHistory.length - 1 - newIndex] || "");
+      }
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIndex > 0) {
+        const newIndex = historyIndex - 1;
+        setHistoryIndex(newIndex);
+        setInput(commandHistory[commandHistory.length - 1 - newIndex] || "");
+      } else if (historyIndex === 0) {
+        setHistoryIndex(-1);
+        setInput("");
+      }
+    }
+  };
 
   return (
     <main
-      ref={containerRef}
-      className="min-h-screen scanlines flicker"
+      className="h-screen w-screen overflow-hidden scanlines flicker cursor-text"
+      onClick={focusInput}
     >
       <MatrixRain />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        {!booted ? (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="w-full max-w-2xl screen-on">
-              <BootSequence onComplete={() => setBooted(true)} />
-            </div>
+      <div
+        ref={terminalRef}
+        className="relative z-10 h-full w-full overflow-y-auto p-4 sm:p-6 font-mono text-sm sm:text-base"
+      >
+        {/* Output */}
+        {output.map((line, i) => (
+          <div
+            key={i}
+            className={`whitespace-pre-wrap break-words ${
+              line.type === "input"
+                ? "text-[var(--terminal-bright)]"
+                : line.type === "system"
+                ? "text-[var(--terminal-dim)]"
+                : line.type === "header"
+                ? "text-[var(--terminal-bright)] crt-glow text-xs sm:text-sm"
+                : line.type === "error"
+                ? "text-red-500"
+                : line.type === "success"
+                ? "text-[var(--terminal-green)]"
+                : line.type === "amber"
+                ? "text-[var(--amber)]"
+                : "text-[var(--terminal-green)]"
+            }`}
+          >
+            {line.text}
           </div>
-        ) : (
-          <>
-            {/* Header */}
-            <header className="text-center mb-8">
-              <ASCIIHeader />
-              <p className="text-[var(--terminal-dim)] mt-4">
-                How I build production frontends with AI in hours, not days.
-              </p>
-              <p className="text-[var(--amber)] text-sm mt-2">
-                ▼ A Meta Landing Page - Built With The Workflow It Describes ▼
-              </p>
-            </header>
+        ))}
 
-            {/* BBS Menu */}
-            <BBSMenu activeSection={activeSection} />
-
-            {/* Sections */}
-            <PhilosophySection />
-            <StackSection />
-            <WorkflowSection />
-            <MetaSection />
-            <ContactSection />
-          </>
+        {/* Input line */}
+        {booted && (
+          <div className="flex items-center mt-1">
+            <span className="text-[var(--terminal-bright)] mr-2">&gt;</span>
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="flex-1 bg-transparent outline-none text-[var(--terminal-green)] caret-[var(--terminal-bright)]"
+              autoFocus
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+            />
+            <span className="cursor">█</span>
+          </div>
         )}
       </div>
     </main>

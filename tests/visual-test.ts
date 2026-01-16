@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 import * as path from "path";
 
 async function runVisualTests() {
-  console.log("Starting visual tests...\n");
+  console.log("Starting visual tests for interactive terminal...\n");
 
   const browser = await chromium.launch();
   const context = await browser.newContext();
@@ -15,64 +15,94 @@ async function runVisualTests() {
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
 
-  // Wait for animations to complete
-  await page.waitForTimeout(2000);
-
-  // Full page screenshot
-  await page.screenshot({
-    path: `${screenshotDir}/desktop-full.png`,
-    fullPage: true
-  });
-  console.log("  - Full page screenshot saved");
-
-  // Hero section
-  await page.screenshot({
-    path: `${screenshotDir}/desktop-hero.png`
-  });
-  console.log("  - Hero section saved");
-
-  // Scroll to philosophy section
-  await page.locator("#philosophy").scrollIntoViewIfNeeded();
+  // Wait for boot sequence to complete (look for the input prompt)
+  await page.waitForSelector('input[type="text"]', { timeout: 10000 });
   await page.waitForTimeout(500);
+
+  // Screenshot after boot
+  await page.screenshot({
+    path: `${screenshotDir}/desktop-boot.png`
+  });
+  console.log("  - Boot sequence screenshot saved");
+
+  // Type 'menu' command
+  await page.keyboard.type("menu");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
+  await page.screenshot({
+    path: `${screenshotDir}/desktop-menu.png`
+  });
+  console.log("  - Menu command screenshot saved");
+
+  // Type '1' for philosophy
+  await page.keyboard.type("1");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
   await page.screenshot({
     path: `${screenshotDir}/desktop-philosophy.png`
   });
   console.log("  - Philosophy section saved");
 
-  // Scroll to meta section
-  await page.locator("#meta").scrollIntoViewIfNeeded();
-  await page.waitForTimeout(500);
+  // Type '2' for stack
+  await page.keyboard.type("2");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
   await page.screenshot({
-    path: `${screenshotDir}/desktop-meta.png`
+    path: `${screenshotDir}/desktop-stack.png`
   });
-  console.log("  - Meta section saved");
+  console.log("  - Stack section saved");
+
+  // Type 'rabbit' for easter egg
+  await page.keyboard.type("rabbit");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
+  await page.screenshot({
+    path: `${screenshotDir}/desktop-rabbit.png`
+  });
+  console.log("  - Easter egg screenshot saved");
+
+  // Type 'clear' then 'help'
+  await page.keyboard.type("clear");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(200);
+  await page.keyboard.type("help");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
+  await page.screenshot({
+    path: `${screenshotDir}/desktop-help.png`
+  });
+  console.log("  - Help menu screenshot saved");
 
   // Test tablet viewport
   console.log("\nTesting Tablet (768x1024)...");
   await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
-  await page.waitForTimeout(1000);
+  await page.waitForSelector('input[type="text"]', { timeout: 10000 });
+  await page.waitForTimeout(500);
   await page.screenshot({
-    path: `${screenshotDir}/tablet-hero.png`
+    path: `${screenshotDir}/tablet-boot.png`
   });
-  console.log("  - Tablet hero saved");
+  console.log("  - Tablet boot saved");
 
   // Test mobile viewport
   console.log("\nTesting Mobile (375x812)...");
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
-  await page.waitForTimeout(1000);
+  await page.waitForSelector('input[type="text"]', { timeout: 10000 });
+  await page.waitForTimeout(500);
   await page.screenshot({
-    path: `${screenshotDir}/mobile-hero.png`
+    path: `${screenshotDir}/mobile-boot.png`
   });
-  console.log("  - Mobile hero saved");
+  console.log("  - Mobile boot saved");
 
-  // Full mobile page
+  // Mobile with menu
+  await page.keyboard.type("menu");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
   await page.screenshot({
-    path: `${screenshotDir}/mobile-full.png`,
-    fullPage: true
+    path: `${screenshotDir}/mobile-menu.png`
   });
-  console.log("  - Mobile full page saved");
+  console.log("  - Mobile menu saved");
 
   // Performance check
   console.log("\nPerformance Metrics:");
