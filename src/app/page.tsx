@@ -46,218 +46,166 @@ interface OutputLine {
   type: "input" | "output" | "system" | "header" | "error" | "success" | "amber";
 }
 
-// Content data
+// Content data - compact for single screen view
 const CONTENT = {
   banner: `
- ███████╗████████╗ █████╗ ██████╗ ████████╗    ██╗    ██╗██╗████████╗██╗  ██╗    ██╗    ██╗██╗  ██╗██╗   ██╗
- ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝    ██║    ██║██║╚══██╔══╝██║  ██║    ██║    ██║██║  ██║╚██╗ ██╔╝
- ███████╗   ██║   ███████║██████╔╝   ██║       ██║ █╗ ██║██║   ██║   ███████║    ██║ █╗ ██║███████║ ╚████╔╝
- ╚════██║   ██║   ██╔══██║██╔══██╗   ██║       ██║███╗██║██║   ██║   ██╔══██║    ██║███╗██║██╔══██║  ╚██╔╝
- ███████║   ██║   ██║  ██║██║  ██║   ██║       ╚███╔███╔╝██║   ██║   ██║  ██║    ╚███╔███╔╝██║  ██║   ██║
- ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝        ╚══╝╚══╝ ╚═╝   ╚═╝   ╚═╝  ╚═╝     ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝`,
+ ╔═╗╔╦╗╔═╗╦═╗╔╦╗  ╦ ╦╦╔╦╗╦ ╦  ╦ ╦╦ ╦╦ ╦
+ ╚═╗ ║ ╠═╣╠╦╝ ║   ║║║║ ║ ╠═╣  ║║║╠═╣╚╦╝
+ ╚═╝ ╩ ╩ ╩╩╚═ ╩   ╚╩╝╩ ╩ ╩ ╩  ╚╩╝╩ ╩ ╩ `,
 
   help: `
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                              AVAILABLE COMMANDS                               ║
-╠═══════════════════════════════════════════════════════════════════════════════╣
-║  help          - Display this help menu                                       ║
-║  menu          - Show main navigation menu                                    ║
-║  1 | why       - THE PHILOSOPHY: Start with Why                               ║
-║  2 | stack     - THE STACK: Tools that play together                          ║
-║  3 | workflow  - THE WORKFLOW: Five steps, no magic                           ║
-║  4 | proof     - THE PROOF: This page IS the proof                            ║
-║  5 | contact   - SYSOP contact information                                    ║
-║  about         - About this system                                            ║
-║  clear         - Clear the terminal                                           ║
-║  rabbit        - Follow the white rabbit...                                   ║
-╚═══════════════════════════════════════════════════════════════════════════════╝`,
+╔════════════════════════════════════════════════════════════════╗
+║                      AVAILABLE COMMANDS                        ║
+╠════════════════════════════════════════════════════════════════╣
+║  help       - Show this menu     │  menu    - Navigation       ║
+║  1 | why    - Philosophy         │  2       - Stack            ║
+║  3          - Workflow           │  4       - Proof            ║
+║  5          - Contact            │  about   - About            ║
+║  clear      - Clear screen       │  rabbit  - Easter egg...    ║
+║  home       - Return to start    │  exit    - Disconnect       ║
+╚════════════════════════════════════════════════════════════════╝`,
 
   menu: `
-┌─────────────────────────────────────────────────────────────────┐
-│                         MAIN MENU                               │
-├─────────────────────────────────────────────────────────────────┤
-│  [1] THE PHILOSOPHY    - Start with Why                         │
-│  [2] THE STACK         - Tools that play together               │
-│  [3] THE WORKFLOW      - Five steps, no magic                   │
-│  [4] THE PROOF         - This page IS the proof                 │
-│  [5] CONTACT SYSOP     - Get in touch                           │
-├─────────────────────────────────────────────────────────────────┤
-│  Type a number or command. Type 'help' for all commands.        │
-└─────────────────────────────────────────────────────────────────┘`,
+┌────────────────────────────────────────────────────────────────┐
+│                          MAIN MENU                             │
+├────────────────────────────────────────────────────────────────┤
+│  [1] THE PHILOSOPHY    - Start with Why                        │
+│  [2] THE STACK         - Tools that play together              │
+│  [3] THE WORKFLOW      - Five steps, no magic                  │
+│  [4] THE PROOF         - This page IS the proof                │
+│  [5] CONTACT SYSOP     - Get in touch                          │
+├────────────────────────────────────────────────────────────────┤
+│  Type a number. Type 'help' for all commands.                  │
+└────────────────────────────────────────────────────────────────┘`,
 
   philosophy: `
-══════════════════════════════════════════════════════════════════════════════════
-                              [01] THE PHILOSOPHY
-══════════════════════════════════════════════════════════════════════════════════
+═══════════════════════ [01] THE PHILOSOPHY ═══════════════════════
 
   "What job is this page HIRING to do for the visitor?"
 
-  Before I write a single line of code, I ask this question.
-  The clarity on WHY determines the quality of WHAT.
+  Before I write code, I ask this question.
+  Clarity on WHY determines quality of WHAT.
 
-  ┌─────────────────────────────────────────────────────────────────────────────┐
-  │ CORE_PRINCIPLES.DAT                                                         │
-  ├─────────────────────────────────────────────────────────────────────────────┤
-  │ 01. CLEAR GOALS FIRST     ─  Define the visitor's takeaway before design    │
-  │ 02. WHY → WHAT → HOW      ─  Every task needs problem, solution, details    │
-  │ 03. CHESTERTON'S FENCE    ─  Understand before modifying. Measure 3x.       │
-  │ 04. NO SHORTCUTS          ─  No fallback code. No TODO later. Excellence.   │
-  └─────────────────────────────────────────────────────────────────────────────┘
+┌─ CORE_PRINCIPLES.DAT ───────────────────────────────────────────┐
+│ 01. CLEAR GOALS FIRST  ─  Define takeaway before design         │
+│ 02. WHY → WHAT → HOW   ─  Every task: problem, solution, detail │
+│ 03. CHESTERTON'S FENCE ─  Understand before modifying           │
+│ 04. NO SHORTCUTS       ─  No fallback code. No TODO. Excellence │
+└─────────────────────────────────────────────────────────────────┘
 
-  Type 'menu' for navigation or '2' for THE STACK
-══════════════════════════════════════════════════════════════════════════════════`,
+  [menu] Navigation  [2] Next: Stack  [home] Start`,
 
   stack: `
-══════════════════════════════════════════════════════════════════════════════════
-                                [02] THE STACK
-══════════════════════════════════════════════════════════════════════════════════
+═══════════════════════ [02] THE STACK ════════════════════════════
 
   > systemctl status --all
 
-  SERVICE          VERSION      STATUS     DESCRIPTION
+  SERVICE       VERSION     STATUS   DESCRIPTION
   ─────────────────────────────────────────────────────────────────
-  CLAUDE_CODE      opus-4.5     [●]        AI Partner
-  CLAUDE_FLOW      v3-alpha     [●]        Swarm Orchestration
-  RUVECTOR         v1.2         [●]        Pattern Learning
-  ARCHON           v2.1         [●]        Task Management
-  VI               9.0          [○]        The OG Editor
+  CLAUDE_CODE   opus-4.5    [●]      AI Partner
+  CLAUDE_FLOW   v3-alpha    [●]      Swarm Orchestration
+  RUVECTOR      v1.2        [●]      Pattern Learning
+  ARCHON        v2.1        [●]      Task Management
+  VI            9.0         [○]      The OG Editor
 
   > cat aliases.sh
-  ────────────────────────────────────────────────────────────────
   alias cfinit='npx claude-flow@alpha init --force'
   alias dsp='claude --dangerously-skip-permissions'
 
   These aren't just tools. They're a SYSTEM.
-  Each piece has a job. Together, they ship.
 
-  Type 'menu' for navigation or '3' for THE WORKFLOW
-══════════════════════════════════════════════════════════════════════════════════`,
+  [menu] Navigation  [3] Next: Workflow  [1] Back`,
 
   workflow: `
-══════════════════════════════════════════════════════════════════════════════════
-                               [03] THE WORKFLOW
-══════════════════════════════════════════════════════════════════════════════════
+═══════════════════════ [03] THE WORKFLOW ═════════════════════════
 
   > ./workflow --verbose
 
-  [1] INITIALIZE & PLAN
-      └─ mkdir → cfinit → add MCPs → initial prompt with context
+  [1] INIT    └─ mkdir → cfinit → MCPs → prompt
+  [2] SPLIT   └─ PRD → Archon tasks (Why/What/How)
+  [3] EXEC    └─ Fetch priority. Analyze BEFORE code.
+  [4] TEST    └─ Validate. Human feedback. (Wife & kids!)
+  [5] COMMIT  └─ After EVERY task. Sequential undo.
 
-  [2] PRD → TASKS
-      └─ Split requirements into Archon tasks. Why/What/How format.
+┌─ CRITICAL INSIGHT ──────────────────────────────────────────────┐
+│ The secret weapon isn't the AI. It's the DISCIPLINE.            │
+│ Clear goals. Task-driven. Commit after wins. Human feedback.    │
+└─────────────────────────────────────────────────────────────────┘
 
-  [3] EXECUTE
-      └─ Fetch highest priority. Analyze BEFORE coding. Plan first.
-
-  [4] VALIDATE
-      └─ Test it. Get human feedback. (I ask my wife and kids.)
-
-  [5] COMMIT
-      └─ Proper commits after EVERY task. Sequential undo = safety.
-
-  ┌─────────────────────────────────────────────────────────────────────────────┐
-  │ ⚠  CRITICAL INSIGHT:                                                        │
-  │    The secret weapon isn't the AI. It's the DISCIPLINE.                     │
-  │    Clear goals. Task-driven. Commit after wins. Get human feedback.         │
-  └─────────────────────────────────────────────────────────────────────────────┘
-
-  Type 'menu' for navigation or '4' for THE PROOF
-══════════════════════════════════════════════════════════════════════════════════`,
+  [menu] Navigation  [4] Next: Proof  [2] Back`,
 
   proof: `
-══════════════════════════════════════════════════════════════════════════════════
-                                [04] THE PROOF
-══════════════════════════════════════════════════════════════════════════════════
+═══════════════════════ [04] THE PROOF ════════════════════════════
 
   > neofetch --meta
 
-        .--.          page@meta-landing
-       |o_o |         ─────────────────────
-       |:_/ |         Build Time: ~90 minutes
-      //   \\ \\        Agents Spawned: 3
-     (|     | )       Interview Qs: 6
-    /'\\_   _/\`\\       First Paint: 68ms
-    \\___)=(___/       Framework: Next.js 16
-                      Style: Tailwind + Matrix CSS
-                      AI: Claude Opus 4.5
+      .--.       page@meta-landing
+     |o_o |      ─────────────────────
+     |:_/ |      Build: ~90min │ Agents: 3
+    //   \\ \\     FCP: 68ms │ Framework: Next.js 16
+   (|     | )    Style: Tailwind + Matrix CSS
+   /'\\_   _/\`\\   AI: Claude Opus 4.5
+   \\___)=(___/
 
-  ┌─────────────────────────────────────────────────────────────────────────────┐
-  │ THE_META_TRUTH.txt                                                          │
-  ├─────────────────────────────────────────────────────────────────────────────┤
-  │ This isn't a mockup. This isn't a concept.                                  │
-  │ You are looking at the ACTUAL OUTPUT of the workflow being described.       │
-  │ The page IS the proof.                                                      │
-  │                                                                             │
-  │ "Follow the white rabbit..."                                                │
-  └─────────────────────────────────────────────────────────────────────────────┘
+┌─ THE_META_TRUTH.txt ────────────────────────────────────────────┐
+│ This isn't a mockup. This IS the actual workflow output.        │
+│ The page IS the proof. "Follow the white rabbit..."             │
+└─────────────────────────────────────────────────────────────────┘
 
-  Type 'menu' for navigation or '5' for CONTACT
-══════════════════════════════════════════════════════════════════════════════════`,
+  [menu] Navigation  [5] Next: Contact  [3] Back`,
 
   contact: `
-══════════════════════════════════════════════════════════════════════════════════
-                               [05] CONTACT SYSOP
-══════════════════════════════════════════════════════════════════════════════════
+═══════════════════════ [05] CONTACT SYSOP ════════════════════════
 
-  ┌─────────────────────────────────────────────────────────────────────────────┐
-  │                                                                             │
-  │   SYSOP: Robert E. Lee                                                      │
-  │   EMAIL: robert@agidreams.us                                                │
-  │                                                                             │
-  │   Built with CLAUDE_CODE + CLAUDE_FLOW                                      │
-  │   January 2026                                                              │
-  │                                                                             │
-  │   "Always start with WHY"                                                   │
-  │                                                                             │
-  └─────────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   SYSOP: Robert E. Lee                                          │
+│   EMAIL: robert@agidreams.us                                    │
+│                                                                 │
+│   Built with CLAUDE_CODE + CLAUDE_FLOW                          │
+│   January 2026                                                  │
+│                                                                 │
+│   "Always start with WHY"                                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 
-  Type 'menu' for navigation or 'help' for commands
-══════════════════════════════════════════════════════════════════════════════════`,
+  [menu] Navigation  [1] Start over  [4] Back`,
 
   about: `
-══════════════════════════════════════════════════════════════════════════════════
-                                ABOUT THIS SYSTEM
-══════════════════════════════════════════════════════════════════════════════════
+═══════════════════════ ABOUT THIS SYSTEM ═════════════════════════
 
-  META-LANDING v1.0 - An Interactive Terminal Experience
+  META-LANDING v1.0 - Interactive Terminal Experience
 
-  This is not a typical landing page. This IS a terminal.
-  You're connected to a simulated Unix system that demonstrates
+  This is not a landing page. This IS a terminal.
+  You're connected to a simulated Unix system demonstrating
   how I build production frontends with AI.
 
-  The twist? This very page was built using the workflow it describes.
+  The twist? Built using the workflow it describes.
 
-  ┌─ INITIAL PROMPT ───────────────────────────────────────────────────────────┐
-  │ "I'm competing in a mini hackathon challenge today.                        │
-  │  'Meta Landing Page' - Build a landing page that showcases how YOU build   │
-  │  beautiful frontends with your AI coding agent.                            │
-  │                                                                            │
-  │  The twist? You're using that very workflow to build it..."                │
-  └────────────────────────────────────────────────────────────────────────────┘
+┌─ INITIAL PROMPT ────────────────────────────────────────────────┐
+│ "Build a landing page that showcases how YOU build frontends    │
+│  with your AI coding agent. The twist? Use that workflow."      │
+└─────────────────────────────────────────────────────────────────┘
 
-  Type 'menu' to continue exploring.
-══════════════════════════════════════════════════════════════════════════════════`,
+  [menu] Continue exploring  [home] Return to start`,
 
   rabbit: `
 
-                    (\\_/)
-                    ( •_•)
-                    / >🔴  Follow the white rabbit, Neo.
+                  (\\__/)
+                  (='.'=)    Follow the white rabbit, Neo.
+                  (")_(")
 
-  Wake up...
-  The Matrix has you...
+  Wake up... The Matrix has you...
 
   The secret isn't the AI.
   The secret is knowing WHY before WHAT.
   The secret is discipline over chaos.
   The secret is committing after every win.
-  The secret is getting human feedback.
 
   There is no spoon. There is no secret.
   Just clear thinking and consistent execution.
 
-  Type 'menu' to return.
-`,
+  [menu] Return  [home] Start`,
 };
 
 export default function Home() {
@@ -333,52 +281,54 @@ export default function Home() {
   const processCommand = (cmd: string) => {
     const trimmed = cmd.trim().toLowerCase();
 
-    // Add command to output
-    addOutput([{ text: `> ${cmd}`, type: "input" }]);
-
     // Add to history
     if (trimmed) {
       setCommandHistory(prev => [...prev, trimmed]);
       setHistoryIndex(-1);
     }
 
+    // Navigation commands clear screen and show new content
+    const showScreen = (content: string, type: OutputLine["type"] = "output") => {
+      setOutput([{ text: content, type }]);
+    };
+
     // Process
     switch (trimmed) {
       case "help":
       case "?":
-        addOutput([{ text: CONTENT.help, type: "output" }]);
+        showScreen(CONTENT.help);
         break;
       case "menu":
       case "m":
-        addOutput([{ text: CONTENT.menu, type: "output" }]);
+        showScreen(CONTENT.menu);
         break;
       case "1":
       case "why":
       case "philosophy":
-        addOutput([{ text: CONTENT.philosophy, type: "output" }]);
+        showScreen(CONTENT.philosophy);
         break;
       case "2":
       case "stack":
       case "tools":
-        addOutput([{ text: CONTENT.stack, type: "output" }]);
+        showScreen(CONTENT.stack);
         break;
       case "3":
       case "workflow":
       case "flow":
-        addOutput([{ text: CONTENT.workflow, type: "output" }]);
+        showScreen(CONTENT.workflow);
         break;
       case "4":
       case "proof":
       case "meta":
-        addOutput([{ text: CONTENT.proof, type: "output" }]);
+        showScreen(CONTENT.proof);
         break;
       case "5":
       case "contact":
       case "sysop":
-        addOutput([{ text: CONTENT.contact, type: "output" }]);
+        showScreen(CONTENT.contact);
         break;
       case "about":
-        addOutput([{ text: CONTENT.about, type: "output" }]);
+        showScreen(CONTENT.about);
         break;
       case "clear":
       case "cls":
@@ -387,41 +337,54 @@ export default function Home() {
       case "rabbit":
       case "follow":
       case "white rabbit":
-        addOutput([{ text: CONTENT.rabbit, type: "output" }]);
+        showScreen(CONTENT.rabbit);
         break;
       case "banner":
-        addOutput([{ text: CONTENT.banner, type: "header" }]);
+      case "home":
+        setOutput([
+          { text: CONTENT.banner, type: "header" },
+          { text: "", type: "output" },
+          { text: "  How I build production frontends with AI in hours, not days.", type: "amber" },
+          { text: "  Type 'help' for commands or 'menu' to begin.", type: "system" },
+        ]);
         break;
       case "ls":
+        addOutput([{ text: `> ${cmd}`, type: "input" }]);
         addOutput([{ text: "PHILOSOPHY.txt  STACK.txt  WORKFLOW.txt  PROOF.txt  CONTACT.txt  .rabbit", type: "output" }]);
         break;
       case "whoami":
+        addOutput([{ text: `> ${cmd}`, type: "input" }]);
         addOutput([{ text: "visitor@meta-landing", type: "output" }]);
         break;
       case "pwd":
+        addOutput([{ text: `> ${cmd}`, type: "input" }]);
         addOutput([{ text: "/home/visitor/start-with-why", type: "output" }]);
         break;
       case "date":
+        addOutput([{ text: `> ${cmd}`, type: "input" }]);
         addOutput([{ text: new Date().toString(), type: "output" }]);
         break;
       case "uname":
       case "uname -a":
+        addOutput([{ text: `> ${cmd}`, type: "input" }]);
         addOutput([{ text: "META-LANDING 1.0 Claude-Opus-4.5 x86_64 GNU/Linux", type: "output" }]);
         break;
       case "exit":
       case "quit":
       case "logout":
-        addOutput([
+        setOutput([
           { text: "", type: "output" },
           { text: "Thanks for visiting! Connection closed.", type: "amber" },
           { text: "Remember: Always start with WHY.", type: "system" },
           { text: "", type: "output" },
+          { text: "Type 'banner' or 'home' to reconnect.", type: "system" },
         ]);
         break;
       case "":
         // Empty command, just show new prompt
         break;
       default:
+        addOutput([{ text: `> ${cmd}`, type: "input" }]);
         addOutput([{ text: `Command not found: ${cmd}. Type 'help' for available commands.`, type: "error" }]);
     }
   };
@@ -460,7 +423,7 @@ export default function Home() {
 
       <div
         ref={terminalRef}
-        className="relative z-10 h-full w-full overflow-y-auto p-4 sm:p-6 font-mono text-sm sm:text-base"
+        className="relative z-10 h-full w-full overflow-hidden p-4 sm:p-6 font-mono text-xs sm:text-sm flex flex-col"
       >
         {/* Output */}
         {output.map((line, i) => (
